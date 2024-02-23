@@ -1,6 +1,6 @@
 ## Fine-tuning LLM for writing LinkedIn posts in Your own language
 
-The notebook in this Repo is an example of how to fine-tune Facebooks Llama-2-7b model, to write LinkedIn posts in Your own language.
+The notebook in this Repo is an example of how to fine-tune Facebooks Llama-2-7b model, to write LinkedIn posts in Your own tone.
 I have included some of my own LinkedIn posts for the training data. Replace these with Your own data to personalize the experience!
 
 
