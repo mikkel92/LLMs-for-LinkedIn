@@ -29,6 +29,8 @@ class ScrapeLinkedIn:
         options.add_argument('--no-sandbox')
         options.add_experimental_option("detach", True)
         options.add_argument('--disable-dev-shm-usage')
+        # add chromes cache folder to save your logins
+        options.add_argument("user-data-dir=/home/mikkel/.cache/google-chrome/Profile 1")
         self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
     def _click(self, path):
@@ -36,19 +38,24 @@ class ScrapeLinkedIn:
         wait.until(EC.element_to_be_clickable((By.XPATH, path))).click()
 
     def login_linkedin(self):
-
+        
+        
         self.driver.get(self.login_url)
+        sleep(1)
+        if self.driver.current_url == "https://www.linkedin.com/feed/":
+            print("Already logged in")
 
-        # get username and password input boxes path
-        username = self.driver.find_element(By.XPATH, "//input[@name='session_key']")
-        password = self.driver.find_element(By.XPATH, "//input[@name='session_password']")
+        else:
+            # get username and password input boxes path
+            username = self.driver.find_element(By.XPATH, "//input[@name='session_key']")
+            password = self.driver.find_element(By.XPATH, "//input[@name='session_password']")
 
-        # input the email id and password
-        username.send_keys(self.user_mail)
-        password.send_keys(self.user_pass)
+            # input the email id and password
+            username.send_keys(self.user_mail)
+            password.send_keys(self.user_pass)
 
-        # click the login button
-        self._click("//button[@type='submit']")
+            # click the login button
+            self._click("//button[@type='submit']")
 
     def load_posts(self):
 
@@ -75,7 +82,7 @@ class ScrapeLinkedIn:
         for text in post_texts:
             all_texts.append(text.text)
 
-        self.driver.close()
+        #self.driver.close()
 
         return all_texts
 
