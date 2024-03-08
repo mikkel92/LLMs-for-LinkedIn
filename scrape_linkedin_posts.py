@@ -57,6 +57,15 @@ class ScrapeLinkedIn:
             # click the login button
             self._click("//button[@type='submit']")
 
+    def get_post_elements(self, post, class_name):
+        
+        all_texts = []
+        post_texts = post.find_elements(By.CLASS_NAME, class_name)
+        for text in post_texts:
+            all_texts.append(text.text)
+
+        return all_texts
+
     def load_posts(self):
 
         # load the page containing posts
@@ -65,31 +74,85 @@ class ScrapeLinkedIn:
 
         # scroll on site until all posts are loaded
         prev_scroll_height = 0
+        y = 0
         scroll_height = self.driver.execute_script("return document.documentElement.scrollHeight")
         while scroll_height > prev_scroll_height:
             prev_scroll_height = int(scroll_height)
-            self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            sleep(2)
-            scroll_height = self.driver.execute_script("return document.documentElement.scrollHeight")
+            
+            i = 0
+            while i < 5:
+                y += 2000
+                self.driver.execute_script(f"window.scrollTo(0, {y});")
+                sleep(1)
+                i += 1
         
+            scroll_height = self.driver.execute_script("return document.documentElement.scrollHeight")
+
+
         # find all posts
         posts = self.driver.find_elements(By.CLASS_NAME, "profile-creator-shared-feed-update__container")
         print("Total number of LinkedIn posts: ", len(posts))
 
-        # put the text from posts in a list containing one entry per post
-        all_texts = []
-        post_texts = self.driver.find_elements(By.CLASS_NAME, "feed-shared-inline-show-more-text")
-        for text in post_texts:
-            all_texts.append(text.text)
+        texts = []
+        reactions = []
+        comments = []
+        reposts = []
+        impressions = []
+
+        for i, post in enumerate(posts):
+            
+            # append post texts
+            texts.append(self.get_post_elements(post, "break-words")[0])
+
+            # append post reactions if any exist
+            reaction = self.get_post_elements(post, "social-details-social-counts__social-proof-fallback-number") + self.get_post_elements(post, "social-details-social-counts__reactions-count")
+            if len(reaction) > 0:
+                reactions.append(int(reaction[0]))
+            else:
+                reactions.append(0)
+
+            # append post comments if any exist
+            comment = self.get_post_elements(post, "social-details-social-counts__item--right-aligned")
+            if len(comment) > 0:
+                comments.append(int(comment[0].split(" ")[0]))
+            else:
+                comments.append(0)
+
+            # append post reposts if any exist
+            if len(comment) > 1:
+                reposts.append(int(comment[1].split(" ")[0]))
+            else:
+                reposts.append(0)
+
+            # append post impressions if any exist
+            impression = self.get_post_elements(post, "ca-entry-point__num-views")
+            if len(impression) > 0:
+                impressions.append(int(impression[0].split(" ")[0].replace(",", "")))
+            else:
+                impressions.append(0)
+
+        # put the text & stats from posts in a list containing one entry per post
+        #texts = [self.get_post_elements(post, "break-words")[0] for post in posts]
+        #reactions = [int((self.get_post_elements(post, "social-details-social-counts__social-proof-fallback-number") + self.get_post_elements(post, "social-details-social-counts__reactions-count"))[0]) for post in posts]
+        #comments = [int(self.get_post_elements(post, "social-details-social-counts__item--right-aligned")[0].split(" ")[0]) if len(self.get_post_elements(post, "social-details-social-counts__item--right-aligned")) > 0 else 0 for post in posts]
+        #reposts = [int(self.get_post_elements(post, "social-details-social-counts__item--right-aligned")[1].split(" ")[0]) if len(self.get_post_elements(post, "social-details-social-counts__item--right-aligned")) > 1 else 0 for post in posts]
+        #impressions = [self.get_post_elements(post, "ca-entry-point__num-views")[0].split(" ")[0] if len(self.get_post_elements(post, "ca-entry-point__num-views")) > 0 else 0 for post in posts]
 
         #self.driver.close()
 
-        return all_texts
+        df = pd.DataFrame({
+            "texts" : texts,
+            "reactions": reactions,
+            "comments": comments,
+            "reposts": reposts,
+            "impressions": impressions
+            })
 
-    def save_posts_to_csv(self, posts):
+        return df
+
+    def save_posts_to_csv(self, df):
 
         # save posts to a csv file
-        df = pd.DataFrame({"texts" : posts})
         df.to_csv("linkedin_posts.csv", index_label="index")
 
 
@@ -97,5 +160,5 @@ if __name__ == "__main__":
 
     scraper = ScrapeLinkedIn()
     scraper.login_linkedin()
-    posts = scraper.load_posts()
-    scraper.save_posts_to_csv(posts)
+    posts_df = scraper.load_posts()
+    scraper.save_posts_to_csv(posts_df)
