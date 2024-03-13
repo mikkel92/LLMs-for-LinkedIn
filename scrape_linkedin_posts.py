@@ -21,6 +21,7 @@ class ScrapeLinkedIn:
 
         # Change these with your urls and credentials
         self.login_url = "https://www.linkedin.com/login/da"
+        # change this to the user you want to scrape posts for
         self.posts_url = "https://www.linkedin.com/in/%F0%9F%9A%80-mikkel-jensen-b2a960159/recent-activity/all/"
         self.user_mail = secrets["linkedin"]["username"] # replace with usename
         self.user_pass = secrets["linkedin"]["password"] # replace with password
