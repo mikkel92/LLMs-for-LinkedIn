@@ -22,8 +22,8 @@ class ScrapeLinkedIn:
         # Change these with your urls and credentials
         self.login_url = "https://www.linkedin.com/login/da"
         self.posts_url = "https://www.linkedin.com/in/%F0%9F%9A%80-mikkel-jensen-b2a960159/recent-activity/all/"
-        self.user_mail = secrets["linkedin"]["username"]
-        self.user_pass = secrets["linkedin"]["password"]
+        self.user_mail = secrets["linkedin"]["username"] # replace with usename
+        self.user_pass = secrets["linkedin"]["password"] # replace with password
 
         # Options for the Chrome driver
         options = Options()
@@ -32,6 +32,7 @@ class ScrapeLinkedIn:
         options.add_experimental_option("detach", True)
         options.add_argument('--disable-dev-shm-usage')
         # add chromes cache folder to save your logins
+        # Change path to match you local cache
         options.add_argument("user-data-dir=/home/mikkel/.cache/google-chrome/Profile 1")
         self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
