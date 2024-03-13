@@ -62,8 +62,8 @@ class ScrapeLinkedIn:
         all_texts = []
         post_texts = post.find_elements(By.CLASS_NAME, class_name)
         for text in post_texts:
-            all_texts.append(text.text)
-
+            all_texts.append(text.get_attribute("innerText"))
+            
         return all_texts
 
     def load_posts(self):
@@ -81,7 +81,7 @@ class ScrapeLinkedIn:
             
             i = 0
             while i < 5:
-                y += 2000
+                y += 1000
                 self.driver.execute_script(f"window.scrollTo(0, {y});")
                 sleep(1)
                 i += 1
@@ -100,7 +100,7 @@ class ScrapeLinkedIn:
         impressions = []
 
         for i, post in enumerate(posts):
-            
+
             # append post texts
             texts.append(self.get_post_elements(post, "break-words")[0])
 
@@ -130,13 +130,6 @@ class ScrapeLinkedIn:
                 impressions.append(int(impression[0].split(" ")[0].replace(",", "")))
             else:
                 impressions.append(0)
-
-        # put the text & stats from posts in a list containing one entry per post
-        #texts = [self.get_post_elements(post, "break-words")[0] for post in posts]
-        #reactions = [int((self.get_post_elements(post, "social-details-social-counts__social-proof-fallback-number") + self.get_post_elements(post, "social-details-social-counts__reactions-count"))[0]) for post in posts]
-        #comments = [int(self.get_post_elements(post, "social-details-social-counts__item--right-aligned")[0].split(" ")[0]) if len(self.get_post_elements(post, "social-details-social-counts__item--right-aligned")) > 0 else 0 for post in posts]
-        #reposts = [int(self.get_post_elements(post, "social-details-social-counts__item--right-aligned")[1].split(" ")[0]) if len(self.get_post_elements(post, "social-details-social-counts__item--right-aligned")) > 1 else 0 for post in posts]
-        #impressions = [self.get_post_elements(post, "ca-entry-point__num-views")[0].split(" ")[0] if len(self.get_post_elements(post, "ca-entry-point__num-views")) > 0 else 0 for post in posts]
 
         #self.driver.close()
 
