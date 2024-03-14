@@ -1,6 +1,9 @@
-## Fine-tuning LLM for writing LinkedIn posts in Your own language
+# Fine-tuning LLM for writing LinkedIn posts in Your own language
 
-The notebook in this Repo is an example of how to fine-tune Facebooks Llama-2-7b model, to write LinkedIn posts in Your own tone.
+The scripts in this repo enables scraping your own LinkedIn posts, analysing them, creating a dataset for fine-tuning and a notebook showcasing how to fine-tune Facebooks Llama-2-7b model, to write LinkedIn posts in Your own tone.
+
+I'm using Llama-2 here. Feel free to change it to a model of your liking.
+
 I have included some of my own LinkedIn posts for the training data. Replace these with Your own data to personalize the experience!
 
 
@@ -17,5 +20,8 @@ By default my posts are scraped. Change to your own profile link.
 
 Running "scrape_linkedin_posts.py" will then save a file called "linkedin_posts.csv".
 
-
 Use the notebook "analyse_posts.ipynb" to start a simple analysis of post statistics.
+
+"process_linkedin_posts.py" will create a new file using the data in "linkedin_posts.csv". The new file is formatted for fine-tuning Llama-2 and is called "processed_posts.jsonl".
+
+Run the notebook "finetune_llama_to_linkedin.ipynb" to create and use a fine-tuned version of Llama-2.
