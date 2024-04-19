@@ -51,15 +51,17 @@ df = pd.read_csv("linkedin_posts.csv", index_col=0)
 model, tokenizer = load_model_and_tokenizer()
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
-init_prompt = "Create a LinkedIn post using the language and tone of Mikkel Jensen. "
 
 print("Summarising texts, this might take a while...")
 
 with open("processed_posts.jsonl", "w") as f:
     for i, row in tqdm(df.iterrows(), total=df.shape[0]):
+
+        init_prompt = f"Create a LinkedIn post of about {round(len(row['texts']), -2)} characters using the language and tone of Mikkel Jensen. "
         to_sum = """
-            Write a concise summary of the following text delimited by triple backquotes. 
-            The summary should have a length of 50 tokens maximum.
+            Write a concise description and summary of the following text delimited by triple backquotes. 
+            It should have a length of 100 tokens maximum, but be as short as possible while adequately describing the content.
+            It should contain a description of the post, how it's built up and how many points were made.
             Start the summary like this: "The post summary is:"
             ```""" + row["texts"] + """```"""
         inputs = tokenizer(to_sum, return_tensors="pt").to(device)
